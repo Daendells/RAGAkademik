@@ -1,6 +1,5 @@
 """
 LLM Module — OpenRouter API (streaming)
-Mendukung ratusan model via satu API key
 """
 
 import os
@@ -13,7 +12,7 @@ load_dotenv()
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 OPENROUTER_API_KEY  = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL    = os.getenv("OPENROUTER_MODEL", "google/gemma-3-4b-it:free")
+OPENROUTER_MODEL    = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.1-8b-instruct:free")
 
 SYSTEM_ROLE = (
     "Kamu adalah asisten akademik kampus yang membantu mahasiswa. "
@@ -24,7 +23,6 @@ SYSTEM_ROLE = (
 
 
 def check_api_status() -> dict:
-    """Cek apakah API key valid dan model tersedia."""
     if not OPENROUTER_API_KEY:
         return {"ok": False, "error": "API key tidak ditemukan di .env"}
     try:
@@ -35,7 +33,7 @@ def check_api_status() -> dict:
         )
         if r.status_code == 200:
             return {"ok": True, "error": "", "model": OPENROUTER_MODEL}
-        return {"ok": False, "error": f"HTTP {r.status_code}: {r.text[:100]}"}
+        return {"ok": False, "error": f"HTTP {r.status_code}"}
     except requests.ConnectionError:
         return {"ok": False, "error": "Tidak dapat terhubung ke OpenRouter"}
     except Exception as e:
@@ -53,9 +51,8 @@ def _build_prompt(question: str, contexts: List[Tuple[str, float]]) -> str:
 
 
 def stream_answer(question: str, contexts: List[Tuple[str, float]]) -> Generator[str, None, None]:
-    """Generator: yield token satu per satu untuk streaming di Streamlit."""
     if not OPENROUTER_API_KEY:
-        yield "❌ API key OpenRouter tidak ditemukan. Pastikan `.env` sudah berisi `OPENROUTER_API_KEY`."
+        yield "❌ API key OpenRouter tidak ditemukan. Tambahkan `OPENROUTER_API_KEY` di `.env`."
         return
 
     try:
@@ -99,13 +96,12 @@ def stream_answer(question: str, contexts: List[Tuple[str, float]]) -> Generator
                 continue
 
     except requests.HTTPError as e:
-        yield f"\n\n❌ HTTP Error {e.response.status_code}: {e.response.text[:200]}"
+        yield f"\n\n❌ HTTP Error {e.response.status_code}: {e.response.text[:300]}"
     except requests.Timeout:
         yield "\n\n❌ Timeout. Coba lagi."
     except Exception as e:
         yield f"\n\n❌ Error: {e}"
 
 
-# Backward compat non-streaming
 def generate_answer(question: str, contexts: List[Tuple[str, float]]) -> str:
     return "".join(stream_answer(question, contexts))
