@@ -1,0 +1,26 @@
+# Environment
+.env
+
+# Cache FAISS & embeddings
+.cache/
+
+# PDF dokumen besar
+*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
