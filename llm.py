@@ -1,62 +1,76 @@
 """
-LLM Module — Ollama streaming (lokal)
+LLM Module — OpenRouter API + Nemotron reasoning (streaming)
 """
 
 import os
 import json
 from typing import List, Tuple, Generator
 import requests
+from dotenv import load_dotenv
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-OLLAMA_MODEL    = os.getenv("OLLAMA_MODEL", "gemma3:latest")
+load_dotenv()
+
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_API_KEY  = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_MODEL    = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
 
 SYSTEM_ROLE = (
-    "Kamu asisten akademik. "
-    "Jawab SINGKAT dan JELAS berdasarkan konteks yang diberikan. "
-    "Gunakan bahasa Indonesia. "
-    "Jika tidak ada di konteks, katakan tidak tahu."
+    "Kamu adalah asisten akademik kampus yang membantu mahasiswa. "
+    "Jawab pertanyaan SECARA JELAS dan LENGKAP berdasarkan konteks yang diberikan. "
+    "Gunakan bahasa Indonesia yang baik. "
+    "Jika informasi tidak ada di konteks, katakan dengan jujur bahwa kamu tidak tahu."
 )
 
 
-def check_ollama_status() -> dict:
+def check_api_status() -> dict:
+    if not OPENROUTER_API_KEY:
+        return {"ok": False, "error": "API key tidak ditemukan di .env"}
     try:
-        r      = requests.get(f"{OLLAMA_BASE_URL}/api/tags", timeout=3)
-        models = [m["name"] for m in r.json().get("models", [])]
-        avail  = any(OLLAMA_MODEL.split(":")[0] in m for m in models)
-        return {"running": True, "model_available": avail, "models": models, "error": ""}
+        r = requests.get(
+            f"{OPENROUTER_BASE_URL}/models",
+            headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}"},
+            timeout=5,
+        )
+        if r.status_code == 200:
+            return {"ok": True, "error": "", "model": OPENROUTER_MODEL}
+        return {"ok": False, "error": f"HTTP {r.status_code}"}
     except requests.ConnectionError:
-        return {"running": False, "model_available": False, "models": [],
-                "error": "Ollama tidak berjalan"}
+        return {"ok": False, "error": "Tidak dapat terhubung ke OpenRouter"}
     except Exception as e:
-        return {"running": False, "model_available": False, "models": [], "error": str(e)}
+        return {"ok": False, "error": str(e)}
 
 
 def _build_prompt(question: str, contexts: List[Tuple[str, float]]) -> str:
-    ctx = "\n\n".join(f"[{i}] {c[:400]}" for i, (c, _) in enumerate(contexts, 1))
-    return f"Konteks:\n{ctx}\n\nPertanyaan: {question}\n\nJawab singkat:"
+    ctx = "\n\n".join(f"[Konteks {i}]\n{c}" for i, (c, _) in enumerate(contexts, 1))
+    return (
+        f"Berikut adalah informasi peraturan akademik yang relevan:\n\n"
+        f"{ctx}\n\n"
+        f"Pertanyaan mahasiswa: {question}\n\n"
+        f"Berikan jawaban yang jelas dan lengkap berdasarkan konteks di atas:"
+    )
 
 
 def stream_answer(question: str, contexts: List[Tuple[str, float]]) -> Generator[str, None, None]:
-    status = check_ollama_status()
-
-    if not status["running"]:
-        yield "❌ Ollama tidak berjalan. Jalankan: `ollama serve`"
-        return
-    if not status["model_available"]:
-        yield f"❌ Model `{OLLAMA_MODEL}` tidak ditemukan. Jalankan: `ollama pull {OLLAMA_MODEL}`"
+    """Generator: yield token satu per satu untuk streaming di Streamlit."""
+    if not OPENROUTER_API_KEY:
+        yield "❌ API key OpenRouter tidak ditemukan. Tambahkan `OPENROUTER_API_KEY` di `.env`."
         return
 
     try:
         r = requests.post(
-            f"{OLLAMA_BASE_URL}/api/chat",
+            f"{OPENROUTER_BASE_URL}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://github.com/Daendells/RAGAkademik",
+                "X-Title": "RAG Akademik",
+            },
             json={
-                "model":  OLLAMA_MODEL,
+                "model": OPENROUTER_MODEL,
                 "stream": True,
-                "options": {
-                    "temperature": 0.1,
-                    "num_predict": 300,
-                    "top_p": 0.85,
-                },
+                "temperature": 0.2,
+                "max_tokens": 1024,
+                "reasoning": {"enabled": True},
                 "messages": [
                     {"role": "system", "content": SYSTEM_ROLE},
                     {"role": "user",   "content": _build_prompt(question, contexts)},
@@ -70,13 +84,23 @@ def stream_answer(question: str, contexts: List[Tuple[str, float]]) -> Generator
         for line in r.iter_lines():
             if not line:
                 continue
-            data  = json.loads(line.decode("utf-8"))
-            token = data.get("message", {}).get("content", "")
-            if token:
-                yield token
-            if data.get("done"):
+            decoded = line.decode("utf-8")
+            if decoded.startswith("data: "):
+                decoded = decoded[6:]
+            if decoded.strip() == "[DONE]":
                 break
+            try:
+                data = json.loads(decoded)
+                delta = data.get("choices", [{}])[0].get("delta", {})
+                # Skip reasoning tokens, hanya tampilkan content akhir
+                token = delta.get("content", "")
+                if token:
+                    yield token
+            except json.JSONDecodeError:
+                continue
 
+    except requests.HTTPError as e:
+        yield f"\n\n❌ HTTP Error {e.response.status_code}: {e.response.text[:300]}"
     except requests.Timeout:
         yield "\n\n❌ Timeout. Coba lagi."
     except Exception as e:
