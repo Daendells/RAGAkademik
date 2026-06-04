@@ -4,7 +4,7 @@ RAG Akademik — Streamlit Chatbot
 
 import streamlit as st
 from rag_pipeline import load_or_build_rag, retrieve
-from llm import stream_answer, check_api_status, OPENROUTER_MODEL
+from llm import stream_answer, check_ollama_status, OLLAMA_MODEL
 
 # ─── Page Config ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -93,12 +93,16 @@ with st.sidebar:
     st.caption("Asisten Peraturan Kampus — Ollama")
     st.divider()
 
-    # Status OpenRouter
-    api = check_api_status()
-    if api["ok"]:
-        st.success(f"✅ OpenRouter siap · `{OPENROUTER_MODEL}`")
+    # Status Ollama
+    ollama = check_ollama_status()
+    if ollama["running"] and ollama["model_available"]:
+        st.success(f"✅ Ollama siap · `{OLLAMA_MODEL}`")
+    elif ollama["running"]:
+        st.warning(f"⚠️ Model `{OLLAMA_MODEL}` belum tersedia")
+        st.code(f"ollama pull {OLLAMA_MODEL}", language="bash")
     else:
-        st.error(f"❌ {api['error']}")
+        st.error("❌ Ollama tidak berjalan")
+        st.code("ollama serve", language="bash")
 
     st.divider()
 
@@ -140,7 +144,7 @@ with st.sidebar:
     st.divider()
     st.caption(
         "📚 Knowledge Base: 30+ topik akademik\n"
-        f"🤖 LLM: `{OPENROUTER_MODEL}`\n"
+        f"🤖 LLM: `{OLLAMA_MODEL}`\n"
         "🔍 Embedding: multilingual-MiniLM-L12"
     )
 
