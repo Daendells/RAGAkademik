@@ -79,6 +79,7 @@ defaults = {
     "rag_ready": False,
     "index": None,
     "chunks": None,
+    "embed_model": None,
     "total_chunks": 0,
 }
 for k, v in defaults.items():
@@ -158,9 +159,9 @@ if not st.session_state.rag_ready:
     _status = st.empty()
     def _cb(msg): _status.info(msg)
     try:
-        idx, chunks = load_or_build_rag(status_callback=_cb)
+        idx, chunks, em = load_or_build_rag(status_callback=_cb)
         st.session_state.update({
-            "index": idx, "chunks": chunks,
+            "index": idx, "chunks": chunks, "embed_model": em,
             "total_chunks": len(chunks), "rag_ready": True,
         })
         _status.success(f"✅ Siap! **{len(chunks)}** dokumen berhasil diindex.", icon="🎉")
@@ -202,6 +203,7 @@ if user_input and user_input.strip():
         question,
         st.session_state.index,
         st.session_state.chunks,
+        st.session_state.embed_model,
     )
 
     # Streaming jawaban AI
