@@ -27,6 +27,9 @@ footer                 { visibility: hidden; }
 [data-testid="stDecoration"]       { display: none !important; }
 [data-testid="stStatusWidget"]     { display: none !important; }
 [data-testid="manage-app-button"]  { display: none !important; }
+.stDeployButton                    { display: none !important; }
+[kind="header"]                     { display: none !important; }
+[data-testid="baseButton-header"]  { display: none !important; }
 
 /* Font global */
 html, body, [class*="css"] {
@@ -99,41 +102,30 @@ for k, v in defaults.items():
 # ─── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 🎓 RAG Akademik")
-    st.caption("Asisten Peraturan Kampus — Ollama")
+    st.caption("Asisten Peraturan Akademik Kampus")
     st.divider()
 
-    # Status OpenRouter
+    # Status API (tanpa nama model)
     api = check_api_status()
     if api["ok"]:
-        st.success(f"✅ OpenRouter siap · `{OPENROUTER_MODEL}`")
+        st.success("✅ Sistem siap digunakan")
     else:
         st.error(f"❌ {api['error']}")
 
     st.divider()
 
-    # Status RAG
-    st.markdown("**📊 Status Sistem**")
-    col1, col2 = st.columns(2)
-    col1.metric("Chunks", st.session_state.total_chunks if st.session_state.rag_ready else "—")
-    col2.metric("Pesan", len(st.session_state.messages))
-
-    if st.session_state.rag_ready:
-        st.success("✅ Index siap")
-    else:
-        st.info("⏳ Memuat index…")
-
-    st.divider()
-
-    # Contoh pertanyaan
+    # Contoh pertanyaan — hanya topik yang ada di knowledge base
     st.markdown("**💡 Contoh Pertanyaan**")
     examples = [
         "Berapa maksimal SKS yang bisa diambil?",
-        "Apa syarat dan prosedur cuti akademik?",
-        "Bagaimana aturan seminar proposal skripsi?",
-        "Apa konsekuensi IPK di bawah 2.0?",
-        "Bagaimana cara urus surat keterangan aktif?",
-        "Apa syarat wisuda dan predikat kelulusan?",
-        "Bagaimana cara dapat beasiswa prestasi?",
+        "Bagaimana prosedur pengajuan cuti akademik?",
+        "Apa syarat mengambil tugas akhir?",
+        "Apa yang terjadi jika IPK di bawah 2.0?",
+        "Bagaimana sistem penilaian dan konversi nilai?",
+        "Apa syarat wisuda program sarjana?",
+        "Apa saja jenis beasiswa yang tersedia?",
+        "Bagaimana cara mendapatkan transkrip nilai?",
+        "Apa peran Dosen Pembimbing Akademik?",
     ]
     for q in examples:
         if st.button(q, key=f"ex_{q[:18]}", use_container_width=True):
@@ -145,13 +137,6 @@ with st.sidebar:
     if st.button("🗑️ Hapus Percakapan", use_container_width=True, type="secondary"):
         st.session_state.messages = []
         st.rerun()
-
-    st.divider()
-    st.caption(
-        "📚 Knowledge Base: 30+ topik akademik\n"
-        f"🤖 LLM: `{OPENROUTER_MODEL}`\n"
-        "🔍 Embedding: multilingual-MiniLM-L12"
-    )
 
 
 # ─── Header ───────────────────────────────────────────────────────────────────
