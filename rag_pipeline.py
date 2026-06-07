@@ -17,18 +17,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _get_secret(key: str, default: str = "") -> str:
+    """Baca secret dari st.secrets (Streamlit Cloud) atau .env (lokal)."""
+    val = os.getenv(key, "")
+    if val:
+        return val
+    try:
+        import streamlit as st
+        return st.secrets.get(key, default)
+    except Exception:
+        return default
+
+
 # --- Config -------------------------------------------------------------------
 EMBEDDINGS_DIR  = os.path.join(os.path.dirname(os.path.abspath(__file__)), "embeddings")
 EMB_PATH        = os.path.join(EMBEDDINGS_DIR, "doc_embeddings.npy")
 CHUNKS_PATH     = os.path.join(EMBEDDINGS_DIR, "chunks.pkl")
 TOP_K           = 3
 
-# OpenRouter config (sama dengan llm.py)
+# OpenRouter config
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_API_KEY  = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_API_KEY  = _get_secret("OPENROUTER_API_KEY")
 
 # Model embedding gratis via OpenRouter
-# Gunakan text-embedding-ada-002 (OpenAI) atau model gratis lainnya
 EMBEDDING_API_MODEL = "openai/text-embedding-3-small"
 
 # --- Load static embeddings ---------------------------------------------------

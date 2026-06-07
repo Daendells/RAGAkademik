@@ -10,9 +10,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _get_secret(key: str, default: str = "") -> str:
+    """Baca secret dari st.secrets (Streamlit Cloud) atau .env (lokal)."""
+    # Coba dari environment variable / .env dulu
+    val = os.getenv(key, "")
+    if val:
+        return val
+    # Fallback: coba dari st.secrets (Streamlit Cloud)
+    try:
+        import streamlit as st
+        return st.secrets.get(key, default)
+    except Exception:
+        return default
+
+
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_API_KEY  = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL    = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+OPENROUTER_API_KEY  = _get_secret("OPENROUTER_API_KEY")
+OPENROUTER_MODEL    = _get_secret("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
 
 SYSTEM_ROLE = (
     "Kamu adalah asisten akademik kampus yang membantu mahasiswa. "
