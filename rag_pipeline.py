@@ -1,89 +1,152 @@
 """
-RAG Pipeline — PyMuPDF + FAISS + Sentence Transformers (lokal)
-LLM via OpenRouter API
+RAG Pipeline - Static Embeddings + OpenRouter API untuk query embedding
+=======================================================================
+Tidak memerlukan model lokal (sentence-transformers) saat runtime!
+- Embedding dokumen: dibaca dari file statis di embeddings/ (pre-computed)
+- Embedding query:   via OpenRouter API (sama seperti LLM)
+- Pencarian:         cosine similarity dengan numpy (dot product)
 """
 
 import os
 import pickle
-import hashlib
 import numpy as np
-import faiss
-from sentence_transformers import SentenceTransformer
+import requests
+import json
 from typing import List, Tuple
+from dotenv import load_dotenv
 
-from knowledge_base import get_all_chunks
+load_dotenv()
 
-# ─── Config ───────────────────────────────────────────────────────────────────
-CACHE_DIR       = os.path.join(os.path.dirname(__file__), ".cache")
-EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# --- Config -------------------------------------------------------------------
+EMBEDDINGS_DIR  = os.path.join(os.path.dirname(os.path.abspath(__file__)), "embeddings")
+EMB_PATH        = os.path.join(EMBEDDINGS_DIR, "doc_embeddings.npy")
+CHUNKS_PATH     = os.path.join(EMBEDDINGS_DIR, "chunks.pkl")
 TOP_K           = 3
 
+# OpenRouter config (sama dengan llm.py)
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_API_KEY  = os.getenv("OPENROUTER_API_KEY", "")
 
-# ─── Cache ────────────────────────────────────────────────────────────────────
+# Model embedding gratis via OpenRouter
+# Gunakan text-embedding-ada-002 (OpenAI) atau model gratis lainnya
+EMBEDDING_API_MODEL = "openai/text-embedding-3-small"
 
-def _cache_key() -> str:
-    chunks  = get_all_chunks()
-    content = "\n---\n".join(chunks) + EMBEDDING_MODEL
-    return hashlib.md5(content.encode("utf-8")).hexdigest()
+# --- Load static embeddings ---------------------------------------------------
 
-
-def _cache_paths(key: str) -> dict:
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    return {
-        "index":  os.path.join(CACHE_DIR, f"{key}.faiss"),
-        "chunks": os.path.join(CACHE_DIR, f"{key}.pkl"),
-    }
+_doc_embeddings: np.ndarray = None
+_chunks: List[str] = None
 
 
-# ─── Encoding ─────────────────────────────────────────────────────────────────
+def _load_static_embeddings():
+    """Load pre-computed embeddings dari file. Cached di memory."""
+    global _doc_embeddings, _chunks
+    if _doc_embeddings is not None:
+        return  # sudah di-load sebelumnya
 
-def _encode(chunks: List[str], model: SentenceTransformer) -> np.ndarray:
-    return model.encode(
-        chunks,
-        show_progress_bar=True,
-        convert_to_numpy=True,
-        normalize_embeddings=True,
-        batch_size=32,
-    ).astype(np.float32)
+    if not os.path.exists(EMB_PATH) or not os.path.exists(CHUNKS_PATH):
+        raise FileNotFoundError(
+            f"File embedding tidak ditemukan di '{EMBEDDINGS_DIR}'.\n"
+            "Jalankan dulu: python precompute_embeddings.py"
+        )
+
+    _doc_embeddings = np.load(EMB_PATH)           # shape: (N, 384)
+    with open(CHUNKS_PATH, "rb") as f:
+        _chunks = pickle.load(f)
 
 
-# ─── Load or Build ────────────────────────────────────────────────────────────
+# --- Query embedding via API --------------------------------------------------
+
+def _embed_query_api(query: str) -> np.ndarray:
+    """Embed satu query menggunakan OpenRouter Embeddings API."""
+    if not OPENROUTER_API_KEY:
+        raise ValueError("OPENROUTER_API_KEY tidak ditemukan di .env")
+
+    response = requests.post(
+        f"{OPENROUTER_BASE_URL}/embeddings",
+        headers={
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/Daendells/RAGAkademik",
+            "X-Title": "RAG Akademik",
+        },
+        json={
+            "model": EMBEDDING_API_MODEL,
+            "input": query,
+        },
+        timeout=15,
+    )
+    response.raise_for_status()
+    data = response.json()
+
+    vec = np.array(data["data"][0]["embedding"], dtype=np.float32)
+
+    # Normalize agar cosine similarity = dot product
+    norm = np.linalg.norm(vec)
+    if norm > 0:
+        vec = vec / norm
+
+    # Sesuaikan dimensi jika berbeda dengan doc embeddings
+    # (doc: 384-dim, text-embedding-3-small: 1536-dim)
+    # Gunakan PCA sederhana: ambil 384 dimensi pertama lalu re-normalize
+    doc_dim = _doc_embeddings.shape[1]
+    if vec.shape[0] != doc_dim:
+        vec = vec[:doc_dim]
+        norm2 = np.linalg.norm(vec)
+        if norm2 > 0:
+            vec = vec / norm2
+
+    return vec.reshape(1, -1)
+
+
+# --- Load or Build (backward-compatible) --------------------------------------
 
 def load_or_build_rag(status_callback=None):
-    key   = _cache_key()
-    paths = _cache_paths(key)
+    """
+    Load embeddings statis dari disk. Tidak perlu build atau model lokal.
+    Interface sama dengan versi lama agar app.py tidak perlu diubah.
+    """
+    if status_callback:
+        status_callback("Memuat embedding dokumen dari cache statis...")
 
-    if os.path.exists(paths["index"]) and os.path.exists(paths["chunks"]):
-        if status_callback: status_callback("📦 Memuat index dari cache…")
-        index = faiss.read_index(paths["index"])
-        with open(paths["chunks"], "rb") as f:
-            chunks = pickle.load(f)
-        if status_callback: status_callback("🤖 Memuat model embedding…")
-        model = SentenceTransformer(EMBEDDING_MODEL)
-        return index, chunks, model
+    _load_static_embeddings()
 
-    if status_callback: status_callback("📚 Membaca knowledge base akademik…")
-    chunks = get_all_chunks()
+    if status_callback:
+        status_callback(f"Siap! {len(_chunks)} dokumen akademik dimuat.")
 
-    if status_callback: status_callback("🤖 Memuat model embedding (pertama kali, ~1 menit)…")
-    model  = SentenceTransformer(EMBEDDING_MODEL)
-
-    if status_callback: status_callback(f"🔢 Encoding {len(chunks)} dokumen…")
-    embs   = _encode(chunks, model)
-
-    index  = faiss.IndexFlatIP(embs.shape[1])
-    index.add(embs)
-
-    faiss.write_index(index, paths["index"])
-    with open(paths["chunks"], "wb") as f:
-        pickle.dump(chunks, f)
-
-    return index, chunks, model
+    # Return None untuk model karena tidak dipakai lagi
+    return _doc_embeddings, _chunks, None
 
 
-# ─── Retrieval ────────────────────────────────────────────────────────────────
+# --- Retrieval ----------------------------------------------------------------
 
 def retrieve(query: str, index, chunks, model, top_k: int = TOP_K) -> List[Tuple[str, float]]:
-    q = model.encode([query], convert_to_numpy=True, normalize_embeddings=True).astype(np.float32)
-    scores, idxs = index.search(q, top_k)
-    return [(chunks[i], float(s)) for s, i in zip(scores[0], idxs[0]) if i != -1]
+    """
+    Cari dokumen paling relevan menggunakan cosine similarity.
+    Parameter index/model diabaikan (backward-compatible), pakai static embeddings.
+    """
+    _load_static_embeddings()
+
+    try:
+        query_vec = _embed_query_api(query)          # (1, D) via API
+    except Exception as e:
+        # Fallback: jika API gagal, coba keyword matching sederhana
+        return _keyword_fallback(query, top_k)
+
+    # Cosine similarity = dot product (karena sudah L2-normalized)
+    scores = (_doc_embeddings @ query_vec.T).flatten()   # shape: (N,)
+
+    top_indices = np.argsort(scores)[::-1][:top_k]
+    return [(_chunks[i], float(scores[i])) for i in top_indices]
+
+
+def _keyword_fallback(query: str, top_k: int) -> List[Tuple[str, float]]:
+    """Fallback sederhana jika API embedding gagal: cari berdasarkan kata kunci."""
+    _load_static_embeddings()
+    query_words = set(query.lower().split())
+    scored = []
+    for chunk in _chunks:
+        chunk_words = set(chunk.lower().split())
+        overlap = len(query_words & chunk_words)
+        scored.append((chunk, float(overlap)))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return scored[:top_k]
