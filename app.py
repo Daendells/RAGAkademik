@@ -19,6 +19,15 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* ── Sembunyikan elemen bawaan Streamlit Cloud ── */
+#MainMenu              { visibility: hidden; }
+header                 { visibility: hidden; }
+footer                 { visibility: hidden; }
+[data-testid="stToolbar"]          { display: none !important; }
+[data-testid="stDecoration"]       { display: none !important; }
+[data-testid="stStatusWidget"]     { display: none !important; }
+[data-testid="manage-app-button"]  { display: none !important; }
+
 /* Font global */
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif !important;
