@@ -14,7 +14,8 @@ from rag.models import Chunk
 # OCR turns "Pasal 37" into "Pasa137" or "Fasal 55"; the sequence check below rejects
 # cross-references such as a line that reads "Pasal 40." inside Pasal 44.
 PASAL_RE = re.compile(r"[PF]asa[l1I]?\s*([0-9lIO]{1,3})\.?")
-BAB_RE = re.compile(r"BAB\s+[IVXL]+")
+BAB_RE = re.compile(r"BAB\s+([IVXL]+|W)")
+BAB_OCR_FIXES = {"BAB W": "BAB VI"}
 SECTION_RE = re.compile(r"(Bagian|Paragraf)\s+\S+")
 AYAT_RE = re.compile(r"\((\d+)\)\s")
 ITEM_RE = re.compile(r"(\d+)\.\s")
@@ -103,7 +104,7 @@ def chunk_regulation(pages: list[str], doc_id: str, max_chars: int = 1800) -> li
                 skip_title = False
                 continue
             if BAB_RE.fullmatch(line):
-                bab, expect_bab_title = line, True
+                bab, expect_bab_title = BAB_OCR_FIXES.get(line, line), True
                 continue
             if SECTION_RE.fullmatch(line):
                 skip_title = True

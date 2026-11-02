@@ -1,0 +1,70 @@
+{"id": "q001", "question": "Berapa SKS maksimal yang boleh diambil mahasiswa S1 di semester 1 dan 2?", "gold_pasal": [34, 51], "answerable": true, "note": "abbrev"}
+{"id": "q002", "question": "Kalau IPS saya 3,2, berapa SKS yang boleh saya ambil semester depan?", "gold_pasal": [51], "answerable": true, "note": "abbrev"}
+{"id": "q003", "question": "IPS-ku di bawah 2,5, maksimal ambil berapa sks?", "gold_pasal": [51], "answerable": true, "note": "abbrev"}
+{"id": "q004", "question": "Berapa SKS paling banyak yang bisa diambil di semester antara?", "gold_pasal": [34], "answerable": true, "note": ""}
+{"id": "q005", "question": "Sampai minggu ke berapa saya masih bisa mengubah FRS?", "gold_pasal": [50], "answerable": true, "note": "abbrev"}
+{"id": "q006", "question": "Batas waktu membatalkan mata kuliah yang sudah diambil kapan?", "gold_pasal": [50], "answerable": true, "note": "paraphrase"}
+{"id": "q007", "question": "Kalau mau drop mata kuliah perlu persetujuan siapa?", "gold_pasal": [50], "answerable": true, "note": "paraphrase"}
+{"id": "q008", "question": "Berapa lama maksimal masa studi untuk mahasiswa sarjana?", "gold_pasal": [72], "answerable": true, "note": ""}
+{"id": "q009", "question": "Saya sudah semester 13, kapan batas terakhir saya harus lulus?", "gold_pasal": [72], "answerable": true, "note": "paraphrase"}
+{"id": "q010", "question": "Apakah masa cuti dihitung dalam masa studi?", "gold_pasal": [72], "answerable": true, "note": ""}
+{"id": "q011", "question": "Berapa semester maksimal boleh cuti untuk mahasiswa S1?", "gold_pasal": [74], "answerable": true, "note": "abbrev"}
+{"id": "q012", "question": "Mahasiswa baru semester 1 apakah boleh langsung cuti?", "gold_pasal": [74], "answerable": true, "note": "paraphrase"}
+{"id": "q013", "question": "Pengajuan cuti paling lambat kapan dan ke siapa?", "gold_pasal": [74], "answerable": true, "note": ""}
+{"id": "q014", "question": "Apa yang terjadi kalau saya tidak daftar ulang dua semester berturut-turut?", "gold_pasal": [49, 58], "answerable": true, "note": "paraphrase"}
+{"id": "q015", "question": "Apa saja yang termasuk kegiatan pendaftaran ulang?", "gold_pasal": [49], "answerable": true, "note": ""}
+{"id": "q016", "question": "Apa itu PSDKU?", "gold_pasal": [86], "answerable": true, "note": "abbrev"}
+{"id": "q017", "question": "Apa saja status akademik mahasiswa yang ada di ITS?", "gold_pasal": [58], "answerable": true, "note": ""}
+{"id": "q018", "question": "Syarat supaya dianggap mahasiswa aktif apa?", "gold_pasal": [58], "answerable": true, "note": ""}
+{"id": "q019", "question": "Kapan evaluasi pertama tahap persiapan dilakukan dan apa syaratnya?", "gold_pasal": [69], "answerable": true, "note": ""}
+{"id": "q020", "question": "Berapa IPK minimal supaya lolos evaluasi akhir semester 2?", "gold_pasal": [69], "answerable": true, "note": "abbrev"}
+{"id": "q021", "question": "Apa itu status percobaan?", "gold_pasal": [69], "answerable": true, "note": "paraphrase"}
+{"id": "q022", "question": "Pada semester berapa evaluasi tahap sarjana dilakukan?", "gold_pasal": [69], "answerable": true, "note": ""}
+{"id": "q023", "question": "Saya bisa kena DO kalau apa saja?", "gold_pasal": [75], "answerable": true, "note": "paraphrase"}
+{"id": "q024", "question": "Apakah mahasiswa yang diberhentikan tetap mendapat surat keterangan?", "gold_pasal": [75], "answerable": true, "note": ""}
+{"id": "q025", "question": "Nilai prasyarat minimal berapa supaya bisa ambil mata kuliah lanjutannya?", "gold_pasal": [70], "answerable": true, "note": "paraphrase"}
+{"id": "q026", "question": "Boleh nggak mengulang mata kuliah tahap persiapan kalau sudah lulus tahap persiapan?", "gold_pasal": [70], "answerable": true, "note": "paraphrase"}
+{"id": "q027", "question": "Kapan mahasiswa boleh memperbaiki nilai mata kuliah tahap persiapan?", "gold_pasal": [70], "answerable": true, "note": ""}
+{"id": "q028", "question": "Berapa skor TOEFL minimal untuk mendaftar sidang tugas akhir S1?", "gold_pasal": [71], "answerable": true, "note": "abbrev"}
+{"id": "q029", "question": "Apa syarat SKEM untuk daftar ujian skripsi?", "gold_pasal": [71], "answerable": true, "note": "abbrev"}
+{"id": "q030", "question": "Selain bahasa Inggris, bahasa asing apa saja yang bisa dipakai untuk syarat sidang TA?", "gold_pasal": [71], "answerable": true, "note": "abbrev"}
+{"id": "q031", "question": "Nilai angka berapa yang dapat huruf A?", "gold_pasal": [68], "answerable": true, "note": ""}
+{"id": "q032", "question": "Nilai BC itu setara berapa poin?", "gold_pasal": [68], "answerable": true, "note": "abbrev"}
+{"id": "q033", "question": "Bagaimana cara menghitung IP?", "gold_pasal": [68], "answerable": true, "note": "abbrev"}
+{"id": "q034", "question": "Apa syarat lulus program sarjana?", "gold_pasal": [76], "answerable": true, "note": ""}
+{"id": "q035", "question": "IPK minimal untuk bisa lulus S1 berapa?", "gold_pasal": [76], "answerable": true, "note": "abbrev"}
+{"id": "q036", "question": "Apa saja predikat kelulusan yang diberikan ITS?", "gold_pasal": [77], "answerable": true, "note": ""}
+{"id": "q037", "question": "Bagaimana IPK predikat dihitung, apakah mata kuliah yang diulang ikut dihitung?", "gold_pasal": [77], "answerable": true, "note": "abbrev"}
+{"id": "q038", "question": "Siapa yang menetapkan kelulusan mahasiswa?", "gold_pasal": [78], "answerable": true, "note": ""}
+{"id": "q039", "question": "Kapan lulusan mendapatkan transkrip nilai?", "gold_pasal": [79], "answerable": true, "note": ""}
+{"id": "q040", "question": "ITS bisa bekerja sama di bidang akademik dengan pihak mana saja?", "gold_pasal": [82], "answerable": true, "note": ""}
+{"id": "q041", "question": "Apa itu SKPI dan siapa yang menerimanya?", "gold_pasal": [81], "answerable": true, "note": "abbrev"}
+{"id": "q042", "question": "Siapa yang menilai tugas akhir mahasiswa sarjana?", "gold_pasal": [67], "answerable": true, "note": "abbrev"}
+{"id": "q043", "question": "Apakah mahasiswa ITS boleh pindah program studi?", "gold_pasal": [61], "answerable": true, "note": ""}
+{"id": "q044", "question": "Bisakah pindah dari kelas reguler ke kelas IUP?", "gold_pasal": [61], "answerable": true, "note": "abbrev"}
+{"id": "q045", "question": "Bolehkah saya ikut kuliah di kampus lain atau magang di luar ITS dan diakui?", "gold_pasal": [59], "answerable": true, "note": "paraphrase"}
+{"id": "q046", "question": "Apa yang dimaksud mata kuliah penciri ITS?", "gold_pasal": [1, 27], "answerable": true, "note": ""}
+{"id": "q047", "question": "Bahasa pengantar kuliah di ITS apa?", "gold_pasal": [28], "answerable": true, "note": ""}
+{"id": "q048", "question": "Satu semester reguler berlangsung berapa minggu?", "gold_pasal": [32], "answerable": true, "note": ""}
+{"id": "q049", "question": "Semester antara bisa diadakan berapa kali setahun?", "gold_pasal": [33], "answerable": true, "note": ""}
+{"id": "q050", "question": "Apa yang dimaksud kelas IUP?", "gold_pasal": [10], "answerable": true, "note": "abbrev"}
+{"id": "q051", "question": "Apakah ITS menerima mahasiswa warga negara asing?", "gold_pasal": [45], "answerable": true, "note": ""}
+{"id": "q052", "question": "Apakah penerimaan mahasiswa baru bisa dibatalkan?", "gold_pasal": [46], "answerable": true, "note": ""}
+{"id": "q053", "question": "Apakah ITS menerima mahasiswa pindahan dari kampus lain?", "gold_pasal": [47], "answerable": true, "note": "paraphrase"}
+{"id": "q054", "question": "Jalur masuk program sarjana ITS lewat apa saja?", "gold_pasal": [40], "answerable": true, "note": ""}
+{"id": "q055", "question": "Apa itu matrikulasi dan siapa yang mendapatkannya?", "gold_pasal": [56], "answerable": true, "note": ""}
+{"id": "q056", "question": "Apa itu kegiatan prakuliah?", "gold_pasal": [55], "answerable": true, "note": ""}
+{"id": "q057", "question": "Sanksi apa yang bisa diberikan kalau mahasiswa melanggar kode etik?", "gold_pasal": [60, 85], "answerable": true, "note": "paraphrase"}
+{"id": "q058", "question": "Apa itu rekognisi pembelajaran lampau atau RPL?", "gold_pasal": [17, 36], "answerable": true, "note": "abbrev"}
+{"id": "q059", "question": "Apakah kuliah di ITS bisa dilakukan secara daring?", "gold_pasal": [36], "answerable": true, "note": "paraphrase"}
+{"id": "q060", "question": "Kapan peraturan akademik ini mulai berlaku?", "gold_pasal": [91], "answerable": true, "note": ""}
+{"id": "q061", "question": "Jam buka perpustakaan ITS sampai jam berapa?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q062", "question": "Berapa UKT untuk program studi Sistem Informasi?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q063", "question": "Bagaimana cara mengurus beasiswa KIP Kuliah?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q064", "question": "Apa syarat lulus di Universitas Indonesia?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q065", "question": "Di mana lokasi kantin terdekat dari gedung rektorat?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q066", "question": "Bagaimana prosedur mengurus kartu tanda mahasiswa yang hilang?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q067", "question": "Berapa kuota mahasiswa baru jalur SNBP tahun ini?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q068", "question": "Siapa nama rektor ITS saat ini dan kapan masa jabatannya berakhir?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q069", "question": "Bagaimana cara reset password akun myITS?", "gold_pasal": [], "answerable": false, "note": ""}
+{"id": "q070", "question": "Apa saja unit kegiatan mahasiswa olahraga di ITS?", "gold_pasal": [], "answerable": false, "note": ""}

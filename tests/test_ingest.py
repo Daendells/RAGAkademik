@@ -70,3 +70,9 @@ def test_citation_text():
     assert c.citation() == "Pasal 12 ayat (2)–(3), hal. 18"
     c2 = Chunk(id="y", doc_id="pr33", bab="BAB II", pasal=5, ayat=None, pages=(12, 13), text="Pasal 5 ...")
     assert c2.citation() == "Pasal 5, hal. 12–13"
+
+
+def test_ocr_mangled_bab_heading(chunks):
+    # The PDF reads "BAB W" for BAB VI (Persiapan Pembelajaran).
+    pasal_50 = next(c for c in chunks if c.pasal == 50)
+    assert pasal_50.bab == "BAB VI PERSIAPAN PEMBELAJARAN"
