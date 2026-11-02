@@ -1,0 +1,5 @@
+{
+  "encoder": "intfloat/multilingual-e5-small",
+  "mode": "hybrid",
+  "reranker": null
+}
