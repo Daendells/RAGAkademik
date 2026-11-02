@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Asisten Peraturan Akademik ITS</title>
+    <meta name="description" content="Tanya aturan akademik ITS. Setiap jawaban menyebut pasal dan halaman sumbernya." />
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="intro">
+        <h1>Asisten Peraturan Akademik ITS</h1>
+        <p>
+          Tanya aturan akademik ITS, misalnya batas sks, cuti, atau syarat lulus. Jawaban disusun dari teks
+          Peraturan Rektor ITS Nomor 33 Tahun 2025 dan selalu menyebut pasal sumbernya.
+        </p>
+      </header>
+
+      <form id="ask-form" class="ask" autocomplete="off">
+        <label for="question" class="visually-hidden">Pertanyaan</label>
+        <textarea id="question" name="question" rows="2" maxlength="500" required
+          placeholder="Contoh: berapa sks maksimal kalau IPS saya 3,2?"></textarea>
+        <button type="submit" id="ask-button">Tanya</button>
+      </form>
+
+      <section class="examples" aria-label="Contoh pertanyaan">
+        <button type="button" class="example">Berapa semester maksimal boleh cuti untuk mahasiswa S1?</button>
+        <button type="button" class="example">Sampai minggu ke berapa saya masih bisa mengubah FRS?</button>
+        <button type="button" class="example">Berapa skor TOEFL minimal untuk daftar sidang TA S1?</button>
+        <button type="button" class="example">Apa syarat lulus program sarjana?</button>
+      </section>
+
+      <section id="result" class="result" hidden>
+        <div id="status" class="status" role="status"></div>
+        <div id="answer" class="answer" aria-live="polite"></div>
+        <div id="sources" class="sources"></div>
+      </section>
+
+      <p class="note">
+        Jawaban disusun oleh AI dari teks peraturan. Cek pasal aslinya sebelum mengambil keputusan.
+      </p>
+    </main>
+
+    <footer class="footer">
+      Sumber:
+      <a href="https://www.its.ac.id/pendidikan/2026/01/23/peraturan-akademik-tahun-2025/">Peraturan Akademik ITS 2025</a>
+      · <a href="https://github.com/Daendells/RAGAkademik">Kode dan hasil evaluasi</a>
+    </footer>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
