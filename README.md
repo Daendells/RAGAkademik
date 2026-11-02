@@ -18,11 +18,11 @@ the Pasal that answers them, and 10 the regulation does not cover.
 
 | Setup | hit@1 | hit@5 | MRR | p95 latency |
 | --- | --- | --- | --- | --- |
-| BM25 (keywords) | 0.70 | 0.95 | 0.800 | < 1 ms |
-| Dense (multilingual-e5-small) | 0.68 | 0.90 | 0.771 | 19 ms |
-| Hybrid, BM25 + dense with rank fusion | 0.80 | 0.93 | 0.849 | 19 ms |
-| **Same, e5-small as quantised ONNX (shipped)** | **0.80** | **0.93** | **0.847** | **5 ms** |
-| Hybrid + cross-encoder reranker | 0.85 | 0.95 | 0.890 | 2.1 s |
+| BM25 (keywords) | 0.70 | 0.95 | 0.805 | < 1 ms |
+| Dense (multilingual-e5-small) | 0.73 | 0.90 | 0.801 | 69 ms |
+| Hybrid, BM25 + dense with rank fusion | 0.80 | 0.93 | 0.850 | 34 ms |
+| **Same, e5-small as quantised ONNX (shipped)** | **0.78** | **0.93** | **0.838** | **12 ms** |
+| Hybrid + cross-encoder reranker | 0.85 | 0.97 | 0.893 | 2.9 s |
 
 The reranker adds 0.04 MRR but makes retrieval about 100 times slower on a free CPU, so it is off by default.
 The shipped app runs the quantised ONNX export of e5-small with a SentencePiece tokenizer and no PyTorch: the

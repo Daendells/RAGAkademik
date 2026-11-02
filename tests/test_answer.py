@@ -127,3 +127,17 @@ def test_sync_bridge_yields_the_same_events():
     events = list(stream_answer_sync("Berapa lama cuti?", FakeRetriever(HITS), client))
     assert [e["type"] for e in events] == ["token", "sources", "done"]
     assert events[1]["answer"] == "Cuti 4 semester [1]."
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("Cuti 4 semester [C1 ayat (2)].", "Cuti 4 semester [1]."),
+        ("Cuti 4 semester [C1, C2].", "Cuti 4 semester [1][2]."),
+        ("Cuti 4 semester [C2; C1 ayat (3)].", "Cuti 4 semester [1][2]."),
+    ],
+)
+def test_parse_citations_accepts_labels_with_extra_text(raw, expected):
+    text, cited, ok = parse_citations(raw, HITS)
+    assert text == expected and ok
+    assert "C" not in text.replace("Cuti", "")

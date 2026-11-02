@@ -54,7 +54,7 @@ if question:
         for event in stream_answer_sync(question.strip(), retriever, client):
             if event["type"] == "token":
                 streamed += event["text"]
-                placeholder.markdown(re.sub(r"\[C\d+\]", "", streamed))
+                placeholder.markdown(re.sub(r"\[[^\[\]]*C\d+[^\[\]]*\]", "", streamed))
             elif event["type"] == "sources":
                 final = event
             elif event["type"] == "error":

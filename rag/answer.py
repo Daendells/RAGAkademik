@@ -22,7 +22,8 @@ DEFAULT_MODELS = "nvidia/nemotron-3-ultra-550b-a55b:free, google/gemma-4-31b-it:
 SYSTEM = f"""Kamu menjawab pertanyaan mahasiswa tentang Peraturan Rektor ITS Nomor 33 Tahun 2025 tentang
 Peraturan Akademik. Aturan:
 1. Jawab hanya dari kutipan peraturan yang diberikan. Jangan memakai pengetahuan lain.
-2. Setiap kalimat yang berisi aturan diakhiri label kutipan sumbernya, misalnya [C1] atau [C2][C3].
+2. Setiap kalimat yang berisi aturan diakhiri label kutipan sumbernya, persis dalam bentuk [C1] atau [C2][C3].
+   Jangan menambahkan nomor ayat atau teks lain di dalam kurung label.
 3. Jika kutipan tidak memuat jawabannya, balas persis: "{REFUSAL}"
 4. Jawab dalam bahasa Indonesia yang singkat dan jelas. Sebutkan angka (sks, semester, nilai) persis seperti di
    kutipan. Teks kutipan berasal dari hasil OCR, jadi abaikan salah ketik kecil.
@@ -44,18 +45,23 @@ def build_prompt(question: str, hits: list[Hit]) -> list[dict]:
 
 
 def parse_citations(text: str, hits: list[Hit]) -> tuple[str, list[Chunk], bool]:
-    """Replace [Cn] labels with [1], [2]... in order of first use; drop labels for unretrieved chunks."""
+    """Replace [Cn] labels with [1], [2]... in order of first use; drop labels for unretrieved chunks.
+
+    Models also write "[C4 ayat (7)]" or "[C1, C2]", so every bracket that names a Cn label is rewritten whole.
+    """
     order: list[int] = []
 
     def renumber(match: re.Match) -> str:
-        n = int(match.group(1))
-        if not 1 <= n <= len(hits):
-            return ""
-        if n not in order:
-            order.append(n)
-        return f"[{order.index(n) + 1}]"
+        out = []
+        for n in map(int, re.findall(r"C(\d+)", match.group(1))):
+            if not 1 <= n <= len(hits):
+                continue
+            if n not in order:
+                order.append(n)
+            out.append(f"[{order.index(n) + 1}]")
+        return "".join(dict.fromkeys(out))
 
-    clean = re.sub(r"\[C(\d+)\]", renumber, text)
+    clean = re.sub(r"\[([^\[\]]*\bC\d+[^\[\]]*)\]", renumber, text)
     clean = re.sub(r"\s+([.,;])", r"\1", clean).strip()
     cited = [hits[n - 1].chunk for n in order]
     return clean, cited, bool(cited)

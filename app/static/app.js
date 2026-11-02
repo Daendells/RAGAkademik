@@ -101,7 +101,7 @@ async function ask(question) {
         if (event.type === "token") {
           setStatus("Menyusun jawaban…");
           streamed += event.text;
-          answerEl.textContent = streamed.replace(/\[C\d+\]/g, "").replace(/\*\*/g, "");
+          answerEl.textContent = streamed.replace(/\[[^\[\]]*C\d+[^\[\]]*\]/g, "").replace(/\*\*/g, "");
         } else if (event.type === "sources") {
           renderAnswer(event.answer, event.sources);
           renderSources(event.sources);
