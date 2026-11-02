@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        DEV: "1"
+    ports:
+      - "7860:7860"
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - .:/app

@@ -1,26 +1,10 @@
-# Environment
 .env
-
-# Cache FAISS & embeddings
-.cache/
-
-# PDF dokumen besar
-*.pdf
-
-# Python
 __pycache__/
 *.py[cod]
-*.pyo
-.Python
-
-# Virtual environment
+.pytest_cache/
+.cache/
 venv/
-env/
 .venv/
-
-# Streamlit
-.streamlit/secrets.toml
-
-# OS
-.DS_Store
-Thumbs.db
+# Only the committed source document under data/ is tracked.
+*.pdf
+!data/peraturan-rektor-33-2025.pdf

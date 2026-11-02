@@ -1,0 +1,6 @@
+.git
+.env
+.cache
+__pycache__
+*.pdf
+!data/peraturan-rektor-33-2025.pdf
