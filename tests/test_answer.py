@@ -106,3 +106,15 @@ def test_openrouter_payload_lists_fallback_models():
     payload = client.payload([{"role": "user", "content": "hi"}])
     assert payload["models"] == ["a/one:free", "b/two:free"]
     assert payload["stream"] is True and payload["temperature"] == 0
+
+
+def test_stream_line_parsing_skips_empty_choices_and_raises_on_error():
+    from rag.answer import StreamError, parse_stream_line
+
+    assert parse_stream_line(': OPENROUTER PROCESSING') is None
+    assert parse_stream_line('data: [DONE]') is None
+    assert parse_stream_line('data: {"choices": [], "usage": {"total_tokens": 9}}') is None
+    assert parse_stream_line('data: {"choices": [{"delta": {"content": "Merah."}}]}') == "Merah."
+    with pytest.raises(StreamError):
+        parse_stream_line('data: {"error": {"message": "Provider returned error"}, "choices": []}')
+    assert issubclass(StreamError, httpx.HTTPError)

@@ -24,7 +24,10 @@ Peraturan Akademik. Aturan:
 2. Setiap kalimat yang berisi aturan diakhiri label kutipan sumbernya, misalnya [C1] atau [C2][C3].
 3. Jika kutipan tidak memuat jawabannya, balas persis: "{REFUSAL}"
 4. Jawab dalam bahasa Indonesia yang singkat dan jelas. Sebutkan angka (sks, semester, nilai) persis seperti di
-   kutipan. Teks kutipan berasal dari hasil OCR, jadi abaikan salah ketik kecil."""
+   kutipan. Teks kutipan berasal dari hasil OCR, jadi abaikan salah ketik kecil.
+5. Jika pertanyaan tidak menyebut jenjang, jawab untuk Program Sarjana (S1). Tambahkan satu kalimat bahwa
+   jenjang lain diatur berbeda hanya bila kutipannya memuat aturan jenjang lain.
+6. Boleh memakai **tebal** untuk angka penting dan daftar berawalan "- ". Jangan memakai judul atau tabel."""
 
 
 class LLMClient(Protocol):
@@ -88,6 +91,21 @@ async def stream_answer(question: str, retriever, client: LLMClient) -> AsyncIte
     yield {"type": "done"}
 
 
+class StreamError(httpx.HTTPError):
+    """An error the provider reported inside a 200 stream."""
+
+
+def parse_stream_line(line: str) -> str | None:
+    """Return the text delta of one SSE line; comments, usage-only chunks and [DONE] give None."""
+    if not line.startswith("data: ") or line == "data: [DONE]":
+        return None
+    data = json.loads(line[6:])
+    if "error" in data:
+        raise StreamError(str(data["error"].get("message", data["error"])))
+    choices = data.get("choices") or []
+    return (choices[0].get("delta") or {}).get("content") if choices else None
+
+
 class OpenRouterClient:
     url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -108,8 +126,6 @@ class OpenRouterClient:
             async with http.stream("POST", self.url, json=payload, headers=headers) as response:
                 response.raise_for_status()
                 async for line in response.aiter_lines():
-                    if not line.startswith("data: ") or line == "data: [DONE]":
-                        continue
-                    delta = json.loads(line[6:])["choices"][0].get("delta", {}).get("content")
+                    delta = parse_stream_line(line)
                     if delta:
                         yield delta

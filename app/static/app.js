@@ -26,7 +26,16 @@ function renderAnswer(text, sources) {
       cite.addEventListener("click", () => openSource(n));
       answerEl.append(cite);
     } else {
-      answerEl.append(part);
+      // Only **bold** is rendered; everything else stays plain text.
+      part.split(/\*\*(.+?)\*\*/g).forEach((piece, i) => {
+        if (i % 2) {
+          const strong = document.createElement("strong");
+          strong.textContent = piece;
+          answerEl.append(strong);
+        } else {
+          answerEl.append(piece);
+        }
+      });
     }
   }
 }
@@ -92,7 +101,7 @@ async function ask(question) {
         if (event.type === "token") {
           setStatus("Menyusun jawaban…");
           streamed += event.text;
-          answerEl.textContent = streamed.replace(/\[C\d+\]/g, "");
+          answerEl.textContent = streamed.replace(/\[C\d+\]/g, "").replace(/\*\*/g, "");
         } else if (event.type === "sources") {
           renderAnswer(event.answer, event.sources);
           renderSources(event.sources);
