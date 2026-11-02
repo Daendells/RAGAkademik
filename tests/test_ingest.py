@@ -76,3 +76,14 @@ def test_ocr_mangled_bab_heading(chunks):
     # The PDF reads "BAB W" for BAB VI (Persiapan Pembelajaran).
     pasal_50 = next(c for c in chunks if c.pasal == 50)
     assert pasal_50.bab == "BAB VI PERSIAPAN PEMBELAJARAN"
+
+
+def test_listed_ocr_typos_are_corrected(chunks):
+    import re
+
+    text = "\n".join(c.text for c in chunks)
+    for typo in ("cuff", "Cuff", "wall", "barn", "basil", "Golan", "dan i"):
+        assert not re.search(rf"\b{typo}\b", text), typo
+    pasal_74 = next(c for c in chunks if c.pasal == 74)
+    assert "cuti studi" in pasal_74.text
+    assert "dosen wali" in text and "Mengundurkan Diri" in text

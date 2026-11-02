@@ -17,3 +17,5 @@ logged below with its reason.
 ## Change log
 
 - 2026-11-02: initial set.
+- 2026-11-03: no question changed. Note on q010 (gold Pasal 72): Pasal 74 ayat (9) contradicts Pasal 72 on whether
+  leave counts toward the study period, so an answer citing Pasal 74 is not wrong; the label is kept for comparability.

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from typing import Protocol
 
 import httpx
@@ -89,6 +90,21 @@ async def stream_answer(question: str, retriever, client: LLMClient) -> AsyncIte
         answer, cited, ok = REFUSAL, [], False
     yield {"type": "sources", "answer": answer, "sources": [_source(c) for c in cited], "cited": ok, "refused": refused}
     yield {"type": "done"}
+
+
+def stream_answer_sync(question: str, retriever, client: LLMClient) -> Iterator[dict]:
+    """The same events as stream_answer, for synchronous callers such as Streamlit."""
+    loop = asyncio.new_event_loop()
+    events = stream_answer(question, retriever, client)
+    try:
+        while True:
+            try:
+                yield loop.run_until_complete(events.__anext__())
+            except StopAsyncIteration:
+                return
+    finally:
+        loop.run_until_complete(events.aclose())
+        loop.close()
 
 
 class StreamError(httpx.HTTPError):

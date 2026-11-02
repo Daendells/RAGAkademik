@@ -21,6 +21,23 @@ AYAT_RE = re.compile(r"\((\d+)\)\s")
 ITEM_RE = re.compile(r"(\d+)\.\s")
 
 
+# Unambiguous OCR misreadings in this scan, fixed in the indexed and displayed text. Each was checked in context;
+# ambiguous ones (for example "dan" that sometimes means "dari") are left as printed.
+OCR_FIXES = {
+    "cuff": "cuti", "Cuff": "Cuti", "wall": "wali", "barn": "baru", "ban": "baru", "basil": "hasil",
+    "hash": "hasil", "Din": "Diri", "tint": "tim", "akbir": "akhir", "hams": "harus", "IFS": "IPS",
+    "dad": "dari", "Ice": "ke", "mats": "mata", "skiff": "aktif", "urnsan": "urusan", "studs": "studi",
+    "dapaian": "capaian", "enain": "enam", "Math": "Mata", "mengenibangkan": "mengembangkan",
+    "sehagaimana": "sebagaimana", "sedildt": "sedikit", "lnstitut": "Institut", "Al hir": "Akhir",
+    "pig": "paling", "dan i": "dari", "Golan": "Gelar",
+}
+OCR_RE = re.compile(r"\b(" + "|".join(map(re.escape, OCR_FIXES)) + r")\b")
+
+
+def fix_ocr(text: str) -> str:
+    return OCR_RE.sub(lambda m: OCR_FIXES[m.group(1)], text)
+
+
 def extract_pages(pdf_path: Path) -> list[str]:
     return [page.extract_text() or "" for page in PdfReader(str(pdf_path)).pages]
 
@@ -94,7 +111,7 @@ def chunk_regulation(pages: list[str], doc_id: str, max_chars: int = 1800) -> li
     bab, expect_bab_title, skip_title = "", False, False
     for page_no, page in enumerate(pages, start=1):
         for raw in page.split("\n"):
-            line = " ".join(raw.split())
+            line = fix_ocr(" ".join(raw.split()))
             if not line or line == str(page_no):
                 continue
             if expect_bab_title:

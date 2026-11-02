@@ -89,8 +89,11 @@ baseline.
 
 ## Limitations
 
-- The source is an OCR'd scan with typos ("cuff" for "cuti", "dosen wall" for "dosen wali"). They are kept as is,
-  so the quoted text shows them; the hybrid search tolerates most of them.
+- The source is an OCR'd scan. A fixed list of unambiguous misreadings ("cuff" for "cuti", "dosen wall" for
+  "dosen wali", 29 in all, see `OCR_FIXES` in [rag/ingest.py](rag/ingest.py)) is corrected; ambiguous ones are left
+  as printed, so some typos remain in the quoted text.
+- The regulation contradicts itself on leave: Pasal 72 counts approved leave in the study period, Pasal 74 ayat (9)
+  says it is not counted. The assistant cites whichever it retrieves (question q010).
 - One document only. Faculty rules, fees, and scholarships live in other regulations and are out of scope.
 - The question set was drafted with an AI assistant from the regulation text and reviewed by the author; the
   answer judge is also an LLM, spot-checked by hand ([eval/answer_results.md](eval/answer_results.md)).

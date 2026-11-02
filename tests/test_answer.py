@@ -118,3 +118,12 @@ def test_stream_line_parsing_skips_empty_choices_and_raises_on_error():
     with pytest.raises(StreamError):
         parse_stream_line('data: {"error": {"message": "Provider returned error"}, "choices": []}')
     assert issubclass(StreamError, httpx.HTTPError)
+
+
+def test_sync_bridge_yields_the_same_events():
+    from rag.answer import stream_answer_sync
+
+    client = FakeClient(tokens=["Cuti 4 semester [C1]."])
+    events = list(stream_answer_sync("Berapa lama cuti?", FakeRetriever(HITS), client))
+    assert [e["type"] for e in events] == ["token", "sources", "done"]
+    assert events[1]["answer"] == "Cuti 4 semester [1]."

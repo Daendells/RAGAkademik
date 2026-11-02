@@ -2,5 +2,5 @@
   "mode": "hybrid",
   "encoder": "intfloat/multilingual-e5-small",
   "runtime": "onnx",
-  "mrr": 0.8473
+  "mrr": 0.8382
 }
