@@ -34,12 +34,12 @@ container uses about 285 MB of RAM and fits a free 512 MB instance, at the same 
 | --- | --- |
 | Answerable questions answered instead of refused | 95% (57/60) |
 | Answers citing at least one correct Pasal | 91% (52/57) |
-| Answers an LLM judge rated faithful to their sources | 88% (50/57) |
+| Answers an LLM judge rated faithful to their sources | 96% (55/57) |
 | Questions outside the regulation correctly refused | 100% (10/10) |
-| Median time per answer (free LLM) | 10 s |
+| Median time per answer (free LLM) | 8 s |
 
-A hand check of 15 answers found 13 faithful; the judge agreed on 10 of 15 and was stricter than the hand check
-in every disagreement. Failure examples and the judge prompt are in [eval/](eval/).
+A hand check of 10 answers found 8 faithful; the judge agreed on 8 of 10 and erred in both directions, so read
+the faithfulness figure as an estimate. Failure examples and the judge prompt are in [eval/](eval/).
 
 ## How it works
 
