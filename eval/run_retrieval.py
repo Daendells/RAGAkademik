@@ -50,7 +50,7 @@ def compare():
     reranker = load_reranker(RERANKER)
     results = []
     for name in ENCODERS:
-        enc = load_encoder(name)
+        enc = load_encoder(name, "torch")
         retriever = Retriever(chunks, enc.encode_passages([c.text for c in chunks]), enc, reranker=reranker)
         for mode in ("bm25", "dense", "hybrid", "hybrid_rerank"):
             if mode == "bm25" and results:

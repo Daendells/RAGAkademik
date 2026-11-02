@@ -19,3 +19,13 @@ Questions missed in the top 5:
 - dense / paraphrase-multilingual-MiniLM-L12-v2: q007, q011, q012, q013, q026, q027, q028, q029, q033, q036, q038, q042, q054, q059, q060
 - hybrid / paraphrase-multilingual-MiniLM-L12-v2: q028, q038, q054, q060
 - hybrid_rerank / paraphrase-multilingual-MiniLM-L12-v2: q010, q054
+
+## Shipped runtime
+
+The app runs the quantised ONNX export of multilingual-e5-small (`onnx/model_qint8_avx512_vnni.onnx`, 118 MB)
+instead of PyTorch, so it fits a 512 MB container. Passages and queries are embedded with the same model.
+
+| Mode | Encoder | hit@1 | hit@3 | hit@5 | MRR | p50 ms | p95 ms |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| dense | e5-small ONNX qint8 | 0.67 | 0.85 | 0.88 | 0.757 | 4 | 5 |
+| hybrid (shipped) | e5-small ONNX qint8 | 0.80 | 0.88 | 0.93 | 0.847 | 4 | 5 |

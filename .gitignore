@@ -8,3 +8,4 @@ venv/
 # Only the committed source document under data/ is tracked.
 *.pdf
 !data/peraturan-rektor-33-2025.pdf
+eval/answers.partial.jsonl

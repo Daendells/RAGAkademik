@@ -17,13 +17,14 @@ def main() -> None:
     parser.add_argument("--encoder", required=True)
     parser.add_argument("--mode", required=True, choices=["bm25", "dense", "hybrid", "hybrid_rerank"])
     parser.add_argument("--reranker", default=None)
+    parser.add_argument("--runtime", default="onnx", choices=["onnx", "torch"])
     args = parser.parse_args()
 
     chunks = chunk_regulation(extract_pages(DATA / "peraturan-rektor-33-2025.pdf"), doc_id="pr33")
     write_chunks(chunks, DATA / "chunks.jsonl")
-    embeddings = load_encoder(args.encoder).encode_passages([c.text for c in chunks])
+    embeddings = load_encoder(args.encoder, args.runtime).encode_passages([c.text for c in chunks])
     np.save(DATA / "embeddings.npy", embeddings.astype(np.float32))
-    config = {"encoder": args.encoder, "mode": args.mode, "reranker": args.reranker}
+    config = {"encoder": args.encoder, "runtime": args.runtime, "mode": args.mode, "reranker": args.reranker}
     (DATA / "index.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     print(f"{len(chunks)} chunks, embeddings {embeddings.shape}, config {config}")
 

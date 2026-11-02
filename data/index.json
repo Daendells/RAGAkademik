@@ -1,5 +1,6 @@
 {
   "encoder": "intfloat/multilingual-e5-small",
+  "runtime": "onnx",
   "mode": "hybrid",
   "reranker": null
 }

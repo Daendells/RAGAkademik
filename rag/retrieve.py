@@ -97,7 +97,7 @@ class Retriever:
         return cls(
             read_chunks(data_dir / "chunks.jsonl"),
             np.load(data_dir / "embeddings.npy"),
-            load_encoder(config["encoder"]),
+            load_encoder(config["encoder"], config.get("runtime", "onnx")),
             reranker=reranker,
             default_mode=config["mode"],
         )

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: rag-akademik-its
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: "nvidia/nemotron-3-ultra-550b-a55b:free, google/gemma-4-31b-it:free"
