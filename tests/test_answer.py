@@ -97,3 +97,12 @@ async def test_llm_failure_yields_one_error_then_done():
     events = await collect(stream_answer("Berapa lama cuti?", FakeRetriever(HITS), client))
     assert [e["type"] for e in events] == ["error", "done"]
     assert "coba lagi" in events[0]["message"].lower()
+
+
+def test_openrouter_payload_lists_fallback_models():
+    from rag.answer import OpenRouterClient
+
+    client = OpenRouterClient(api_key="k", model="a/one:free, b/two:free")
+    payload = client.payload([{"role": "user", "content": "hi"}])
+    assert payload["models"] == ["a/one:free", "b/two:free"]
+    assert payload["stream"] is True and payload["temperature"] == 0

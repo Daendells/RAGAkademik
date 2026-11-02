@@ -16,6 +16,7 @@ from rag.retrieve import Hit
 REFUSAL = "Informasi ini tidak ditemukan dalam Peraturan Akademik ITS 2025."
 ERROR_MESSAGE = "Layanan AI sedang tidak tersedia. Coba lagi beberapa saat lagi."
 TOP_K = 5
+DEFAULT_MODELS = "nvidia/nemotron-3-ultra-550b-a55b:free, google/gemma-4-31b-it:free"
 
 SYSTEM = f"""Kamu menjawab pertanyaan mahasiswa tentang Peraturan Rektor ITS Nomor 33 Tahun 2025 tentang
 Peraturan Akademik. Aturan:
@@ -92,11 +93,16 @@ class OpenRouterClient:
 
     def __init__(self, api_key: str | None = None, model: str | None = None, timeout: float = 30.0):
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY", "")
-        self.model = model or os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+        # Comma-separated list: OpenRouter tries the next model when one is rate-limited or down.
+        names = model or os.getenv("OPENROUTER_MODEL") or DEFAULT_MODELS
+        self.models = [m.strip() for m in names.split(",") if m.strip()]
         self.timeout = timeout
 
+    def payload(self, messages: list[dict]) -> dict:
+        return {"models": self.models, "messages": messages, "stream": True, "temperature": 0}
+
     async def stream(self, messages: list[dict]) -> AsyncIterator[str]:
-        payload = {"model": self.model, "messages": messages, "stream": True, "temperature": 0}
+        payload = self.payload(messages)
         headers = {"Authorization": f"Bearer {self.api_key}", "X-Title": "RAG Akademik ITS"}
         async with httpx.AsyncClient(timeout=self.timeout) as http:
             async with http.stream("POST", self.url, json=payload, headers=headers) as response:
